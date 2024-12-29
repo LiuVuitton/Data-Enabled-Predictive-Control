@@ -1,1 +1,1 @@
-# Data-Enabled-Predictive-Control
+# Data Enabled Predictive Control
