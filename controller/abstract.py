@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-class AbstractController(ABC):
+class Controller(ABC):
     def __init__(self):
         pass
 

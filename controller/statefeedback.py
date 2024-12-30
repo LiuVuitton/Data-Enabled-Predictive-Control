@@ -1,8 +1,8 @@
 from typing import override
-from controller.abstract import AbstractController
+from controller.abstract import Controller
 import numpy.typing as npt
 
-class StateFeedbackController(AbstractController):
+class StateFeedbackController(Controller):
     def __init__(self, K: npt.NDArray):
         self.K = K
 

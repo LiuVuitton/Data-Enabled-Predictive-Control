@@ -1,9 +1,9 @@
 from typing import override
-from controller.abstract import AbstractController
+from controller.abstract import Controller
 import numpy as np
 import numpy.typing as npt
 
-class PID(AbstractController):
+class PID(Controller):
     def __init__(self,
                  Kp: npt.NDArray,
                  Ki: npt.NDArray,
