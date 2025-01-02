@@ -9,11 +9,13 @@ from typing import Optional, Callable, List, Tuple, override
 
 class System(ABC):
     def __init__(self, 
-                 dynamics: Callable[[npt.NDArray, npt.NDArray], npt.NDarray],
+                 dynamics: Callable[[npt.NDArray, npt.NDArray], npt.NDArray],
                  dim_x: int,
                  dim_u: int,
                  ) -> None:
         self.dynamics = dynamics
+        self.x = ca.MX.sym('x', dim_x)
+        self.u = ca.MX.sym('u', dim_u)
         self.dim_x = dim_x
         self.dim_u = dim_u
 
@@ -21,9 +23,7 @@ class System(ABC):
                      x_op: npt.NDArray,
                      u_op: npt.NDArray
                      ) -> Tuple[npt.NDArray]:
-        x = ca.MX.sym('x', self.dim_x)
-        u = ca.MX.sym('u', self.dim_u)
-        f = self.dynamics(x, u)
+        f = self.dynamics(self.x, self.u)
         A = ca.jacobian(f, x)(x_op, u_op)
         B = ca.jacobian(f, u)(x_op, u_op)
         return (A, B)
@@ -31,4 +31,7 @@ class System(ABC):
     @abstractmethod
     def linearize(self, x_op: npt.NDArray, u_op: npt.NDArray) -> 'System':
         pass
+
+    def observe(self, x, u):
+        return x
     

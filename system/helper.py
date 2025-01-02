@@ -6,14 +6,14 @@ import numpy.typing as npt
 
 from typing import Optional, Callable, List, Tuple, override
 
-def discretize_euler(dynamics: Callable[[npt.NDArray, npt.NDArray], npt.NDarray],
+def discretize_euler(dynamics: Callable[[npt.NDArray, npt.NDArray], npt.NDArray],
                       x: npt.NDArray,
                       u: npt.NDArray,
                       sample_time: float
                       ) -> npt.NDArray:
     return x + sample_time * dynamics(x, u)
 
-def discretize_rk4(dynamics: Callable[[npt.NDArray, npt.NDArray], npt.NDarray],
+def discretize_rk4(dynamics: Callable[[npt.NDArray, npt.NDArray], npt.NDArray],
                       x: npt.NDArray,
                       u: npt.NDArray,
                       sample_time: float

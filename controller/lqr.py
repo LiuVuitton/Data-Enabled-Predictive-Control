@@ -4,6 +4,7 @@ import numpy.typing as npt
 import scipy
 from typing import Optional
 
+
 class LQR(StateFeedbackController):
     def __init__(self,
                  A: npt.NDArray,

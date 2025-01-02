@@ -11,7 +11,7 @@ from typing import Optional, Callable, List, Tuple, override
 
 class DiscreteSystem(System):
     def __init__(self, 
-                 dynamics: Callable[[npt.NDArray, npt.NDArray], npt.NDarray],
+                 dynamics: Callable[[npt.NDArray, npt.NDArray], npt.NDArray],
                  dim_x: int,
                  dim_u: int,
                  sample_time: Optional[int] = 1.0
@@ -21,8 +21,10 @@ class DiscreteSystem(System):
 
     def step(self,
              x: npt.NDArray,
-             u: npt.NDArray
+             u: Optional[npt.NDArray] = None
              ) -> npt.NDArray:
+        if u is None:
+            u = np.zeros(self.dim_u)
         return self.dynamics(x, u)
     
     @override
@@ -30,3 +32,18 @@ class DiscreteSystem(System):
         A, B = self.get_jacobian(x_op, u_op)
         dynamics_lin = lambda x, u: A @ x + B @ u
         return DiscreteSystem(dynamics_lin, self.dim_x, self.dim_u, self.sample_time)
+    
+
+class LinearDiscreteSystem(DiscreteSystem):
+    def __init__(self,
+                 A: npt.NDArray,
+                 B: npt.NDArray,
+                 dim_x: int,
+                 dim_u: int,
+                 sample_time: float
+                 ) -> None:
+        def dynamics(x, u):
+            return A @ x + B @ u
+        super().__init__(dynamics, dim_x, dim_u)
+        self.A = A
+        self.B = B

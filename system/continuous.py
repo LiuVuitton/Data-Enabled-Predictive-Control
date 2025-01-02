@@ -13,7 +13,7 @@ from typing import Optional, Callable, List, Tuple, override
 
 class ContinuousSystem(System):
     def __init__(self, 
-                 dynamics: Callable[[npt.NDArray, npt.NDArray], npt.NDarray],
+                 dynamics: Callable[[npt.NDArray, npt.NDArray], npt.NDArray],
                  dim_x: int,
                  dim_u: int,
                  ) -> None:
@@ -31,10 +31,16 @@ class ContinuousSystem(System):
                    ) -> 'DiscreteSystem':
         match discretization_method:
             case 'euler':
-                dynamics_discrete = discretize_euler(self.dynamics, self.x, self.u, sample_time)
+                def dynamics_discrete(x, u):
+                    return x + sample_time * self.dynamics(x, u)
                 
             case 'rk4':
-                dynamics_discrete = discretize_rk4(self.dynamics, self.x, self.u, sample_time)
+                def dynamics_discrete(x, u):
+                    k1 = self.dynamics(x, u)
+                    k2 = self.dynamics(x + 0.5 * sample_time * k1, u)
+                    k3 = self.dynamics(x + 0.5 * sample_time * k2, u)
+                    k4 = self.dynamics(x + sample_time * k3, u)
+                    return x + (sample_time / 6.0) * (k1 + 2 * k2 + 2 * k3 + k4)
 
         return DiscreteSystem(dynamics_discrete, self.dim_x, self.dim_u, sample_time)
     
@@ -52,6 +58,7 @@ class LinearContinuousSystem(ContinuousSystem):
         self.A = A
         self.B = B
 
+    # TODO change this to return a linear discrete system
     @override
     def discretize(self,
                    sample_time: float,
@@ -59,12 +66,21 @@ class LinearContinuousSystem(ContinuousSystem):
                    ) -> 'DiscreteSystem':
         match discretization_method:
             case 'euler':
-                dynamics_discrete = discretize_euler(self.dynamics, self.x, self.u, sample_time)
+                def dynamics_discrete(x, u):
+                    return x + sample_time * self.dynamics(x, u)
                 
             case 'rk4':
-                dynamics_discrete = discretize_rk4(self.dynamics, self.x, self.u, sample_time)
+                def dynamics_discrete(x, u):
+                    k1 = self.dynamics(x, u)
+                    k2 = self.dynamics(x + 0.5 * sample_time * k1, u)
+                    k3 = self.dynamics(x + 0.5 * sample_time * k2, u)
+                    k4 = self.dynamics(x + sample_time * k3, u)
+                    return x + (sample_time / 6.0) * (k1 + 2 * k2 + 2 * k3 + k4)
             
             case 'exact':
-                dynamics_discrete = discretize_exact(self.A, self.B, self.x, self.u, sample_time)
+                def dynamics_discrete(x, u):
+                    A_d = scipy.linalg.expm(self.A * sample_time)
+                    B_d = np.linalg.pinv(A) @ (A_d - np.eye(self.A.shape[0])) @ self.B
+                    return A_d @ x + B_d @ u
 
         return DiscreteSystem(dynamics_discrete, self.dim_x, self.dim_u, sample_time)
