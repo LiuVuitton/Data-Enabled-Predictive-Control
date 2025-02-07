@@ -1,8 +1,8 @@
 import numpy as np
 import casadi as ca
-from system.continuous import ContinuousSystem
+from model.continuous import ContinuousModel
 
-class Pendulum(ContinuousSystem):
+class Pendulum(ContinuousModel):
     def __init__(self, length, mass, damping, gravity=9.81):
         self.length = length
         self.mass = mass

@@ -6,6 +6,7 @@ import numpy.typing as npt
 
 from typing import Optional, Callable, List, Tuple, override
 
+
 def discretize_euler(dynamics: Callable[[npt.NDArray, npt.NDArray], npt.NDArray],
                       x: npt.NDArray,
                       u: npt.NDArray,

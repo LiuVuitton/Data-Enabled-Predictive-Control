@@ -1,3 +1,4 @@
+from typing import override
 import numpy as np
 import casadi as ca
 import numpy.typing as npt
@@ -9,17 +10,23 @@ class DeePC(Controller):
                  y_d: npt.NDArray,
                  Q: npt.NDArray,
                  R: npt.NDArray,
-                 constraints,
                  initial_length: int,
                  horizon_length: int
                  ) -> None:
         self.u_d = u_d
         self.y_d = y_d
-        self.constraints = constraints
         self.initial_length = initial_length
         self.horizon_length = horizon_length
         self._setup_hankel(u_d, y_d, initial_length, horizon_length)
         self._setup_DeePC()
+
+    @override
+    def control(self,
+                y_ref: npt.NDArray,
+                u_init: npt.NDArray,
+                y_init: npt.NDArray,
+                ) -> npt.NDArray:
+        pass
 
     def _setup_hankel(self) -> None:
         U_d = hankel(self.u_d, self.initial_length + self.horizon_length)
